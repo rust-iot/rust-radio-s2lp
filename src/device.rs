@@ -68,6 +68,36 @@ pub enum RXMode {
     DirectGPIO = 0x02,
 }
 
+#[doc="Radio states (table 48)"]
+pub enum State {
+    Shutdown = 0xFF,
+    Standby = 0x02,
+    SleepA = 0x01,  // Sleep without FIFO retention
+    SleepB = 0x03,  // Sleep with FIFO retention
+    Ready = 0x00,
+    Lock = 0x0C,
+    Rx = 0x30,
+    Tx = 0x5C,
+    SynthSetup = 0x50,
+}
+
+#[doc="Radio commands (table 49)"]
+pub enum Command {
+    Tx              = 0x60, // from: READY Send the S2-LP to TX state for transmission
+    Rx              = 0x61, // from: READY Send the S2-LP to RX state for reception
+    Ready           = 0x62, // from: STANDBY, SLEEP, LOCK Go to READY state
+    Standby         = 0x63, // from: READY Go to STANDBY state
+    Sleep           = 0x64, // from: READY Go to SLEEP state
+    LockRx          = 0x65, // from: READY Go to LOCK state by using the RX configuration of the synthesizer
+    LockRx          = 0x66, // from: READY Go to LOCK state by using the TX configuration of the synthesizer
+    SAbort          = 0x67, // from: TX, RX Exit from TX or RX states and go to READY state
+    LDCReload       = 0x68, // from: ANY Reload the LDC timer with a pre-programmed value storedin registers
+    Reset           = 0x70, // from: ANY Reset the S2-LP state machine and registers values
+    FlushRXFifo     = 0x71, // from: All Clean the RX FIFO
+    FlushTxFifo     = 0x72, // from: All Clean the TX FIFO
+    SequenceUpdate  = 0x73, // from: TE ANY Reload the packet sequence counter with the value stored in register
+}
+
 #[doc="S2-LP Register Locations"]
 #[allow(non_camel_case_types)]
 pub enum Registers {
