@@ -1,6 +1,8 @@
+// S2-LP Radio Driver
+// Copyright 2018 Ryan Kurte
+
 #![no_std]
 
-#![feature(conservative_impl_trait)]
 #![feature(never_type)]
 #![feature(unproven)]
 extern crate embedded_hal as hal;
@@ -12,18 +14,20 @@ use hal::blocking::spi;
 use hal::spi::{Mode, Phase, Polarity};
 use hal::digital::{OutputPin};
 
-mod device;
+pub mod device;
 mod command;
 
 #[doc="S2LP SPI operating mode"]
-pub const mode: Mode = Mode{ polarity: Polarity::IdleLow, phase: Phase::CaptureOnFirstTransition};
+pub const MODE: Mode = Mode{ polarity: Polarity::IdleLow, phase: Phase::CaptureOnFirstTransition};
 
+#[doc="S2LP device object"]
 pub struct S2LP<SPI, SDN, IO> {
     spi: SPI,
     sdn: SDN,
     gpio: [IO; 4],
 }
 
+#[doc="S2LP configuration"]
 pub struct Config {
     rf_freq_mhz: u16,
     clock_freq: device::ClockFreq,
