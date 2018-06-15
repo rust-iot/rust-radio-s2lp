@@ -262,4 +262,12 @@ pub enum Registers {
     IRQ_STATUS2     = 0xFB, // 7:0 INT_LEVEL[23:16]
     IRQ_STATUS1     = 0xFC, // 7:0 INT_LEVEL[15:8]
     IRQ_STATUS0     = 0xFD, // 7:0 INT_LEVEL[7:0]
+
+    FIFO            = 0xFF, // FIFO Read/Write address
+}
+
+enum Command {
+    Write   = 0x00, // SPI Write register command
+    Read    = 0x01, // SPI Read register command
+    Strobe  = 0x80, // SPI Strobe command
 }
