@@ -89,7 +89,7 @@ pub enum Command {
     Standby         = 0x63, // from: READY Go to STANDBY state
     Sleep           = 0x64, // from: READY Go to SLEEP state
     LockRx          = 0x65, // from: READY Go to LOCK state by using the RX configuration of the synthesizer
-    LockRx          = 0x66, // from: READY Go to LOCK state by using the TX configuration of the synthesizer
+    LockRx2          = 0x66, // from: READY Go to LOCK state by using the TX configuration of the synthesizer
     SAbort          = 0x67, // from: TX, RX Exit from TX or RX states and go to READY state
     LDCReload       = 0x68, // from: ANY Reload the LDC timer with a pre-programmed value storedin registers
     Reset           = 0x70, // from: ANY Reset the S2-LP state machine and registers values
@@ -266,7 +266,7 @@ pub enum Registers {
     FIFO            = 0xFF, // FIFO Read/Write address
 }
 
-enum Command {
+pub enum SpiCommand {
     Write   = 0x00, // SPI Write register command
     Read    = 0x01, // SPI Read register command
     Strobe  = 0x80, // SPI Strobe command

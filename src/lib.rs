@@ -16,6 +16,7 @@ use hal::digital::{OutputPin};
 
 pub mod device;
 mod command;
+use device::{SpiCommand};
 
 #[doc="S2LP SPI operating mode"]
 pub const MODE: Mode = Mode{ polarity: Polarity::IdleLow, phase: Phase::CaptureOnFirstTransition};
@@ -45,6 +46,24 @@ where
 
 
         Ok(s2lp)
+    }
+
+    fn read(&mut self, reg: u8, data: &[u8]) -> Result<[u8], E> {
+        let mut out_buf = [0u8; data.len() + 2];
+        out_buf[0] = SpiCommand::Read;
+        out_buf[1] = reg;
+
+        let buf_in = self.spi.transfer(out_buf)?;
+
+        Ok(())
+    }
+
+    fn write(&mut self, reg: u8, data: &[u8]) -> Result<(), E> {
+        let mut out_buf = [0u8; len(data) + 2];
+        out_buf[0] = SpiCommand::Write;
+        out_buf[1] = reg;
+
+        self.spi.write(&out_buf)?
     }
 }
 
