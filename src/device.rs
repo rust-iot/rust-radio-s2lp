@@ -1,7 +1,8 @@
 //! S2-LP Device definitions
 //! Copyright 2018 Ryan Kurte
 
-#[doc = "Switch mode power supply [SMPS] Voltage levels"]
+/// Switch mode power supply [SMPS] Voltage levels
+#[derive(Copy, Clone, Debug)]
 pub enum SMPSLevel {
     Smps1v2 = 0b001,
     Smps1v3 = 0b010,
@@ -12,7 +13,8 @@ pub enum SMPSLevel {
     Smps1v8 = 0b111,
 }
 
-#[doc = "Clock Frequencies"]
+/// Clock Frequencies
+#[derive(Copy, Clone, Debug)]
 pub enum ClockFreq {
     Clock24MHz,
     Clock25MHz,
@@ -21,10 +23,21 @@ pub enum ClockFreq {
     Clock50MHz,
 }
 
-#[doc = "Supported frequency bands"]
+/// Supported frequency bands
 pub const BANDS: [(u16, u16); 3] = [(430, 470), (470, 512), (860, 940)];
 
-#[doc = "Modulation modes"]
+/// Check if a frequency is in one of the valid bands
+pub fn frequency_valid(frequency: u16) -> bool {
+    for (l, h) in BANDS.iter() {
+        if frequency > *l && frequency < *h {
+            return true;
+        }
+    }
+    return false;
+}
+
+/// Modulation modes
+#[derive(Copy, Clone, Debug)]
 pub enum Modulation {
     Mod2FSK = 0b000,
     Mod4FSK = 0b001,
@@ -35,23 +48,27 @@ pub enum Modulation {
     ModCW = 0b111,
 }
 
-#[doc = "GPIO Pin Modes"]
+/// GPIO Pin Modes
+#[derive(Copy, Clone, Debug)]
 pub enum GPIOMode {
     DigitalInput = 0b01,
     DigitalOutputLowPower = 0b00,
     DigitalOutputHighPower = 0b11,
 }
 
-#[doc = "GPIO Pin Operation"]
+/// GPIO Pin Operation
+#[derive(Copy, Clone, Debug)]
 pub enum GPIOSelect {}
 
-#[doc = "Clock recovery post filter length"]
+/// Clock recovery post filter length
+#[derive(Copy, Clone, Debug)]
 pub enum PostFilterLen {
     FilterLen8 = 0x00,
     FilterLen16 = 0x01,
 }
 
-#[doc = "Packet handler packet format"]
+/// Packet handler packet format
+#[derive(Copy, Clone, Debug)]
 pub enum PacketFormat {
     Basic = 0x00,
     FifteenFour = 0x01,
@@ -59,14 +76,34 @@ pub enum PacketFormat {
     Stack = 0x03,
 }
 
-#[doc = "Packet handler receive mode"]
+/// Packet handler receive mode
+#[derive(Copy, Clone, Debug)]
 pub enum RXMode {
     Normal = 0x00,
     DirectFIFO = 0x01,
     DirectGPIO = 0x02,
 }
 
-#[doc = "Radio states (table 48)"]
+/// External clock reference mode
+#[derive(Copy, Clone, Debug)]
+pub enum ExtRefMode {
+    XO = 0,
+    XIN = 0x80,
+}
+
+pub const XO_RCO_CONF0_EXT_REF_REGMASK: u8 = 0x80;
+
+/// External SMPS mode
+#[derive(Copy, Clone, Debug)]
+pub enum ExtSmpsMode {
+    Enable = 0x00,
+    Disable = 0x20,
+}
+
+pub const PM_CONF0_EXT_SMPS_REGMASK: u8 = 0x20;
+
+/// Radio states (table 48)
+#[derive(Copy, Clone, Debug)]
 pub enum State {
     Shutdown = 0xFF,
     Standby = 0x02,
@@ -79,7 +116,8 @@ pub enum State {
     SynthSetup = 0x50,
 }
 
-#[doc = "Radio commands (table 49)"]
+/// Radio commands (table 49)
+#[derive(Copy, Clone, Debug)]
 pub enum Command {
     Tx = 0x60,             // from: READY Send the S2-LP to TX state for transmission
     Rx = 0x61,             // from: READY Send the S2-LP to RX state for reception
@@ -96,7 +134,8 @@ pub enum Command {
     SequenceUpdate = 0x73, // from: TE ANY Reload the packet sequence counter with the value stored in register
 }
 
-#[doc = "S2-LP Register Locations"]
+/// S2-LP Register Locations
+#[derive(Copy, Clone, Debug)]
 #[allow(non_camel_case_types)]
 pub enum Registers {
     // GPIO configuration
@@ -264,9 +303,13 @@ pub enum Registers {
     FIFO = 0xFF, // FIFO Read/Write address
 }
 
+/// SPI command modes
+#[derive(Copy, Clone, Debug)]
 pub enum SpiCommand {
     Write = 0x00,  // SPI Write register command
     Read = 0x01,   // SPI Read register command
     Strobe = 0x80, // SPI Strobe command
 }
 
+pub const XO_RCO_CONF0_REFDIV_REGMASK: u8 = 0x08;
+pub const XO_RCO_CONF1_PD_CLKDIV_REGMASK: u8 = 0x10;
