@@ -2,7 +2,6 @@
 //! Copyright 2018 Ryan Kurte
 
 #![no_std]
-#![feature(never_type)]
 extern crate embedded_hal as hal;
 
 extern crate nb;
@@ -31,6 +30,7 @@ pub struct S2lp<SPI, OUTPUT, INPUT, DELAY> {
 }
 
 /// S2lp errors
+#[derive(Debug)]
 pub enum Error<IoError> {
     Io(IoError),
 }
@@ -51,11 +51,11 @@ pub struct Config {
 
 impl<E, SPI, OUTPUT, INPUT, DELAY> S2lp<SPI, OUTPUT, INPUT, DELAY>
 where
-    SPI: spi::Transfer<u8, Error=E> + spi::Write<u8, Error=E> + FullDuplex<u8, Error=E>,
+    SPI: spi::Transfer<u8, Error=E> + spi::Write<u8, Error=E>,
     OUTPUT: OutputPin,
     INPUT: InputPin,
     DELAY: delay::DelayMs<u32>,
-    E: Clone + core::fmt::Debug,
+    E: core::fmt::Debug,
 {
     pub fn new(spi: SPI, cs: OUTPUT, sdn: OUTPUT, int: INPUT, delay: DELAY) -> Result<Self, Error<E>> {
         let mut s2lp = S2lp { spi, sdn, cs, int, delay };
@@ -238,7 +238,7 @@ mod tests {
     extern crate embedded_hal_mock;
     use tests::embedded_hal_mock::MockError;
     use tests::embedded_hal_mock::spi::{Mock as SpiMock, Transaction as SpiTransaction};
-    use tests::embedded_hal_mock::pin::{Mock as PinMock, Transaction as PinTransaction};
+    use tests::embedded_hal_mock::pin::{Mock as PinMock, Transaction as PinTransaction, State as PinState};
     use tests::embedded_hal_mock::delay::MockNoop;
 
     extern crate embedded_hal;
@@ -255,7 +255,7 @@ mod tests {
     
         let mut spi = SpiMock::new(&[]);
         let mut cs = PinMock::new(&[]);
-        let mut sdn = PinMock::new(&[PinTransaction::set(false), PinTransaction::set(true)]);
+        let mut sdn = PinMock::new(&[PinTransaction::set(PinState::Low), PinTransaction::set(PinState::High)]);
         let mut int = PinMock::new(&[]);
 
         let s: Box<spi::Write<u8, Error=MockError>> = Box::new(spi.clone());
