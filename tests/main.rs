@@ -3,10 +3,13 @@ use std::env;
 
 
 extern crate tokio;
-use tokio::runtime::Runtime;
+use tokio::runtime::Builder;
 
 extern crate futures;
 use futures::prelude::*;
+
+extern crate simplelog;
+use simplelog::{TermLogger, LevelFilter, Config as LogConfig};
 
 extern crate embedded_hal;
 
@@ -26,6 +29,10 @@ use radio_s2lp::{S2lp};
 #[test]
 #[ignore]
 fn test_devices() {
+
+    let _ = TermLogger::init(LevelFilter::Info, LogConfig::default()).unwrap();
+
+
     let spi0_name = env::var("RADIO0_SPI").expect("RADIO0_SPI environmental variable undefined");
 
     let spi1_name = env::var("RADIO1_SPI").expect("RADIO1_SPI environmental variable undefined");
@@ -40,37 +47,45 @@ fn test_devices() {
     let int1_name = env::var("RADIO1_INT").expect("RADIO1_INT environmental variable undefined");
 
 
-    let mut rt = Runtime::new().unwrap();
+    let mut rt = Builder::new()
+        .blocking_threads(2)
+        .core_threads(2)
+        .build()
+        .unwrap();
 
 
-    let connect = Client::new(remote_addr()).map_err(|e| panic!(e) );
+    let worker = futures::lazy(move || {
+        
+        Client::new(remote_addr()).map_err(|e| panic!(e) )
+        .and_then(move |mut c|  {
 
-    rt.block_on(connect.and_then(move |mut c| -> Result<(), ()> {
+            let spi = Future::select2(c.spi(&spi0_name, 20_000, SpiMode::Mode0), c.spi(&spi1_name, 20_000, SpiMode::Mode0));
 
-        let spi0 = c.spi(&spi0_name, 20_000, SpiMode::Mode0).wait().expect("Failed to open SPI0");
-        let spi1 = c.spi(&spi1_name, 20_000, SpiMode::Mode0).wait().expect("Failed to open SPI1");
+            spi.map(move |spi| (c, spi))
+        }).and_then(|(c, spi)| {
 
-        let cs0 = c.pin(&cs0_name, PinMode::Output).wait().expect("Failed to open CS0");
-        let cs1 = c.pin(&cs1_name, PinMode::Output).wait().expect("Failed to open CS1");
+            //let cs = Future::select2(c.pin(&cs0_name, PinMode::Output), c.pin(&cs1_name, PinMode::Output));
 
-        let reset0 = c.pin(&reset0_name, PinMode::Output).wait().expect("Failed to open RESET0");
-        let reset1 = c.pin(&reset1_name, PinMode::Output).wait().expect("Failed to open RESET1");
+            //let reset = Future::select2(c.pin(&reset0_name, PinMode::Output), c.pin(&reset1_name, PinMode::Output));
 
-        let int0 = c.pin(&int0_name, PinMode::Input).wait().expect("Failed to open SLEEP0");
-        let int1 = c.pin(&int1_name, PinMode::Input).wait().expect("Failed to open SLEEP1");
+            //let int = Future::select2(c.pin(&int0_name, PinMode::Input), c.pin(&int1_name, PinMode::Input));
 
 
-        println!("Initialising radios");
+            println!("Initialising radios");
+        
+
+            //let mut _radio0 = S2lp::new(spi0, cs0, reset0, int0, Delay{}).expect("Failed to initialise radio0");
+
+            //let mut _radio1 = S2lp::new(spi1, cs1, reset1, int1, Delay{}).expect("Failed to initialise radio1");
+
+
+            // TODO: 
+
+            Ok(())
+
+        })
+
+    });
     
-
-        let mut _radio0 = S2lp::new(spi0, cs0, reset0, int0, Delay{}).expect("Failed to initialise radio0");
-
-        let mut _radio1 = S2lp::new(spi1, cs1, reset1, int1, Delay{}).expect("Failed to initialise radio1");
-
-
-        // TODO: 
-
-        Ok(())
-
-    })).unwrap();
+    rt.block_on(worker.map(|_| () ).map_err(|e| panic!(e) )).unwrap();
 }
