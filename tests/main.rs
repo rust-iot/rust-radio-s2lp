@@ -18,7 +18,7 @@ use linux_embedded_hal::{Delay};
 
 extern crate remote_hal;
 use remote_hal::common::{PinMode, SpiMode};
-use remote_hal::{manager::Manager, remote::Client, remote_addr};
+use remote_hal::{manager::Manager, remote::Client, remote::InitRequest, remote_addr};
 
 extern crate radio;
 use radio::{Transmit, Receive, Registers};
@@ -59,22 +59,38 @@ fn test_devices() {
         Client::new(remote_addr()).map_err(|e| panic!(e) )
         .and_then(move |mut c|  {
 
-            let spi = Future::select2(c.spi(&spi0_name, 20_000, SpiMode::Mode0), c.spi(&spi1_name, 20_000, SpiMode::Mode0));
+            let reqs = vec![
+                InitRequest::Spi{path: spi0_name, baud: 20_000, mode: SpiMode::Mode0},
+                InitRequest::Spi{path: spi1_name, baud: 20_000, mode: SpiMode::Mode0},
+                InitRequest::Pin{path: reset0_name, mode: PinMode::Output},
+                InitRequest::Pin{path: reset1_name, mode: PinMode::Output},
+                InitRequest::Pin{path: cs0_name, mode: PinMode::Output},
+                InitRequest::Pin{path: cs1_name, mode: PinMode::Output},
+                InitRequest::Pin{path: int0_name, mode: PinMode::Input},
+                InitRequest::Pin{path: int1_name, mode: PinMode::Input},
+            ];
 
-            spi.map(move |spi| (c, spi))
-        }).and_then(|(c, spi)| {
+            c.init_all(&reqs).map(move |devs| (c, devs) )
+        })
+        .and_then(move |(c, mut devs)| {
 
-            //let cs = Future::select2(c.pin(&cs0_name, PinMode::Output), c.pin(&cs1_name, PinMode::Output));
+            devs.reverse();
+            let spi0 = devs.pop().unwrap().spi().unwrap();
+            let spi1 = devs.pop().unwrap().spi().unwrap();
 
-            //let reset = Future::select2(c.pin(&reset0_name, PinMode::Output), c.pin(&reset1_name, PinMode::Output));
+            let reset0 = devs.pop().unwrap().pin().unwrap();
+            let reset1 = devs.pop().unwrap().pin().unwrap();
 
-            //let int = Future::select2(c.pin(&int0_name, PinMode::Input), c.pin(&int1_name, PinMode::Input));
+            let cs0 = devs.pop().unwrap().pin().unwrap();
+            let cs1 = devs.pop().unwrap().pin().unwrap();
 
+            let int0 = devs.pop().unwrap().pin().unwrap();
+            let int1 = devs.pop().unwrap().pin().unwrap();
 
             println!("Initialising radios");
         
 
-            //let mut _radio0 = S2lp::new(spi0, cs0, reset0, int0, Delay{}).expect("Failed to initialise radio0");
+            let mut _radio0 = S2lp::new(spi0, cs0, reset0, int0, Delay{}).expect("Failed to initialise radio0");
 
             //let mut _radio1 = S2lp::new(spi1, cs1, reset1, int1, Delay{}).expect("Failed to initialise radio1");
 

@@ -8,10 +8,11 @@ authors = ["Ryan Kurte <ryankurte@gmail.com>"]
 embedded-hal = { version = "0.2.2", features = ["unproven"] }
 nb = "0.1.1"
 radio = { path = "../rust-radio" }
+remote-hal = "0.5.0"
 
 [dev-dependencies]
 embedded-hal-mock = { version = "0.5.0" }
-remote-hal = "0.4.0"
+remote-hal = "0.5.0"
 tokio = "0.1.18"
 futures = "0.1.25"
 linux-embedded-hal = "0.2.2"
