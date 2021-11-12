@@ -1,268 +1,309 @@
 //! S2-LP Radio Driver
 //! Copyright 2018 Ryan Kurte
 
-#![no_std]
-extern crate embedded_hal as hal;
+#![cfg_attr(not(feature="std"), no_std)]
 
-extern crate nb;
+use core::fmt::Debug;
+use core::marker::PhantomData;
 
-use hal::blocking::{spi, delay};
-use hal::digital::v2::{InputPin, OutputPin};
-use hal::spi::{Mode, Phase, Polarity, FullDuplex};
+use embedded_hal::{delay::blocking::DelayUs, spi::{Mode, Phase, Polarity}};
+use radio::{BasicChannel, Channel as _, Registers as _};
+use log::debug;
 
-pub mod command;
+pub mod base;
+pub use base::{Base, Io};
+
 pub mod device;
-use device::{Registers, SpiCommand, XO_RCO_CONF1_PD_CLKDIV_REGMASK, XO_RCO_CONF0_REFDIV_REGMASK};
+use device::*;
+
 
 /// S2lp SPI operating mode
-pub const MODE: Mode = Mode {
+pub const SPI_MODE: Mode = Mode {
     polarity: Polarity::IdleLow,
     phase: Phase::CaptureOnFirstTransition,
 };
 
-/// S2lp device object
-pub struct S2lp<SPI, OUTPUT, INPUT, DELAY> {
-    spi: SPI,
-    sdn: OUTPUT,
-    cs: OUTPUT,
-    int: INPUT,
-    delay: DELAY,
-}
 
-/// S2lp errors
-#[derive(Debug)]
-pub enum Error<IoError> {
-    Io(IoError),
-}
-
-impl <IoError>From<IoError> for Error<IoError> {
-	fn from(e: IoError) -> Self {
-		Error::Io(e)
-	}
+/// S2lp device instance
+pub struct S2lp<Hal, SpiErr: Debug, PinErr: Debug, DelayErr: Debug> {
+    hal: Hal,
+    _err: PhantomData<Error<SpiErr, PinErr, DelayErr>>,
 }
 
 /// S2lp configuration
 pub struct Config {
     /// Radio frequency for communication
-    rf_freq_mhz: u16,
+    pub rf_freq_mhz: u16,
     // Clock / Crystal frequency
-    clock_freq: device::ClockFreq,
+    pub clock_freq: ClockFreq,
 }
 
-impl<E, SPI, OUTPUT, INPUT, DELAY> S2lp<SPI, OUTPUT, INPUT, DELAY>
+impl Default for Config {
+    fn default() -> Self {
+        Self { 
+            rf_freq_mhz: 433, 
+            clock_freq: ClockFreq::Clock48MHz,
+        }
+    }
+}
+
+/// S2lp device errors
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "thiserror", derive(thiserror::Error))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum Error<SpiErr: Debug, PinErr: Debug, DelayErr: Debug> {
+    #[cfg_attr(feature = "thiserror", error("SPI error: {0}"))]
+    /// Communications (SPI or UART) error
+    Spi(SpiErr),
+
+    #[cfg_attr(feature = "thiserror", error("Pin error: {0}"))]
+    /// Pin control error
+    Pin(PinErr),
+
+    #[cfg_attr(feature = "thiserror", error("Delay error: {0}"))]
+    /// Delay error
+    Delay(DelayErr),
+
+    #[cfg_attr(feature = "thiserror", error("Unexpected register value (reg: 0x{0:02x} val: 0x:{1:02x}"))]
+    /// Unexpected response from device
+    UnexpectedValue(u8, u8),
+
+    #[cfg_attr(feature = "thiserror", error("Unsupported operation"))]
+    /// Unsupported operation
+    Unsupported,
+
+    #[cfg_attr(feature = "thiserror", error("Device communication failed"))]
+    /// Device communication failed
+    NoCommunication,
+}
+
+
+impl<Hal, SpiErr, PinErr, DelayErr> S2lp<Hal, SpiErr, PinErr, DelayErr>
 where
-    SPI: spi::Transfer<u8, Error=E> + spi::Write<u8, Error=E>,
-    OUTPUT: OutputPin,
-    INPUT: InputPin,
-    DELAY: delay::DelayMs<u32>,
-    E: core::fmt::Debug,
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
 {
-    pub fn new(spi: SPI, cs: OUTPUT, sdn: OUTPUT, int: INPUT, delay: DELAY) -> Result<Self, Error<E>> {
-        let mut s2lp = S2lp { spi, sdn, cs, int, delay };
+    /// Create a new device with the provided HAL and config
+    pub fn new(hal: Hal, _config: Config) -> Result<Self, Error<SpiErr, PinErr, DelayErr>> {
+        let mut s2lp = S2lp { hal, _err: PhantomData };
 
-        s2lp.sdn.set_low();
+        debug!("Resetting device");
 
-        s2lp.delay.delay_ms(10);
+        // Reset device
+        s2lp.hal.reset()?;
 
-        s2lp.sdn.set_high();
+        debug!("Fetching device info");
 
+        // Attempt to read part information to check connectivity
+        let i = s2lp.info()?;
+        if i.part_no == 0x00 || i.part_no == 0xFF {
+            return Err(Error::NoCommunication)
+        }
+        debug!("Found device: {:?}", i);
+
+        // TODO: actually configure the thing
 
         Ok(s2lp)
     }
 
-    /// Read data from a specified register address
-    /// This consumes the provided input data array and returns a reference to this on success
-    fn reg_read<'a>(&mut self, reg: Registers, data: &'a mut [u8]) -> Result<&'a [u8], Error<E>> {
-        // Setup read command
-        let out_buf: [u8; 2] = [SpiCommand::Read as u8, reg as u8];
-        // Assert CS
-        self.cs.set_low();
-        // Write command
-        match self.spi.write(&out_buf) {
-            Ok(_r) => (),
-            Err(e) => {
-                self.cs.set_high();
-                return Err(e.into());
-            }
-        };
-        // Transfer data
-        let res = match self.spi.transfer(data) {
-            Ok(r) => r,
-            Err(e) => {
-                self.cs.set_high();
-                return Err(e.into());
-            }
-        };
-        // Clear CS
-        self.cs.set_high();
-        // Return result (contains returned data)
-        Ok(res)
-    }
-
-    /// Write data to a specified register address
-    pub fn reg_write(&mut self, reg: Registers, data: &[u8]) -> Result<(), Error<E>> {
-        // Setup write command
-        let out_buf: [u8; 2] = [SpiCommand::Write as u8, reg as u8];
-        // Assert CS
-        self.cs.set_low();
-        // Write command
-        match self.spi.write(&out_buf) {
-            Ok(_r) => (),
-            Err(e) => {
-                self.cs.set_high();
-                return Err(e.into());
-            }
-        };
-        // Transfer data
-        match self.spi.write(&data) {
-            Ok(_r) => (),
-            Err(e) => {
-                self.cs.set_high();
-                return Err(e.into());
-            }
-        };
-        // Clear CS
-        self.cs.set_high();
-
-        Ok(())
-    }
-
-    /// Update a register value with the provided mask
-    /// new = (old & ~mask) | (val & mask)
-    pub fn reg_update(&mut self, reg: Registers, mask: u8, val: u8) -> Result<(), Error<E>> {
-        let mut tmp = [0u8; 1];
-        let old = self.reg_read(reg.clone(), &mut tmp)?[0];
-        let new = (old & !mask) | (val & mask);
-        self.reg_write(reg, &[new])
-    }
-
     /// Send a command strobe
-    pub fn cmd_strobe(&mut self, cmd: device::Command) -> Result<(), Error<E>> {
-        let out_buf: [u8; 2] = [SpiCommand::Strobe as u8, cmd.clone() as u8];
-
-        // Set SMPS frequency for RX and TX commands
+    pub fn cmd_strobe(&mut self, cmd: device::Command) -> Result<(), Error<SpiErr, PinErr, DelayErr>>  {
+        // Override SMPS frequency for RX and TX commands
         match cmd {
             device::Command::Rx => {
                 // sets the SMPS switching frequency to 3.12MHz.
-                self.reg_write(Registers::PM_CONF3, &[0x76])?;
+                self.write_register::<PmConf3>(0x76.into())?;
             },
             device::Command::Tx => {
                 //sets the SMPS switching frequency to 5.46MHz about for ETSI regulation compliance.
-                self.reg_write(Registers::PM_CONF3, &[0x9c])?;
+                self.write_register::<PmConf3>(0x9c.into())?;
             },
             _ => {}
         };
 
         // Execute command strobe
-        self.cs.set_low();
-        let res = self.spi.write(&out_buf);
-        self.cs.set_high();
+        self.hal.spi_write(&[SpiCommand::Strobe as u8, cmd.clone() as u8], &[])?;
 
-        res.map( |_s| () ).map_err(|e| e.into() )
+        Ok(())
     }
 
     /// Fetch device information (part number and version)
-    pub fn device_info(&mut self) -> Result<(u8, u8), Error<E>> {
-        // Read part number
-        let mut data = [0u8; 1];
-        let part = match self.reg_read(Registers::DEVICE_INFO1, &mut data) {
-            Ok(p) => p,
-            Err(e) => return Err(e),
-        };
-
-        // Read version
-        let mut data = [0u8; 1];
-        let version = match self.reg_read(Registers::DEVICE_INFO0, &mut data) {
-            Ok(p) => p,
-            Err(e) => return Err(e),
-        };
-
-        Ok((part[0], version[0]))
-    }
-
-    /// Set external clock reference mode
-    pub fn set_ext_ref_mode(&mut self, mode: device::ExtRefMode) -> Result<(), Error<E>> {
-        self.reg_update(Registers::XO_RCO_CONF0, device::XO_RCO_CONF0_EXT_REF_REGMASK, mode as u8)
-    }
-
-    /// Set external power supply mode
-    pub fn set_ext_smps_mode(&mut self, mode: device::ExtSmpsMode) -> Result<(), Error<E>> {
-        self.reg_update(Registers::PM_CONF0, device::PM_CONF0_EXT_SMPS_REGMASK, mode as u8)
-    }
-
-    /// Check whether the digital clock divider is enabled
-    pub fn get_digital_divider_enabled(&mut self) -> Result<bool, Error<E>> {
-        let mut tmp = [0u8; 1];
-        let val = self.reg_read(Registers::XO_RCO_CONF1, &mut tmp)?[0];
-        Ok(val & XO_RCO_CONF1_PD_CLKDIV_REGMASK != 0)
-    }
-
-    /// Enable the digital clock divider
-    pub fn enable_digital_divider(&mut self, enabled: bool) -> Result<(), Error<E>> {
-        match enabled {
-            true => self.reg_update(Registers::XO_RCO_CONF1, device::XO_RCO_CONF1_PD_CLKDIV_REGMASK, 0),
-            false => self.reg_update(Registers::XO_RCO_CONF1, device::XO_RCO_CONF1_PD_CLKDIV_REGMASK, device::XO_RCO_CONF1_PD_CLKDIV_REGMASK),
-        }
-    }
-
-    /// Fetch reference divider enabled state
-    pub fn get_reference_divider_enabled(&mut self) -> Result<bool, Error<E>> {
-        let mut tmp = [0u8; 1];
-        let val = self.reg_read(Registers::XO_RCO_CONF0, &mut tmp)?[0];
-        Ok(val & XO_RCO_CONF0_REFDIV_REGMASK != 0)
-    }
-
-    /// Enable or disable reference divider
-    pub fn enable_reference_divider(&mut self, enabled: bool) -> Result<(), Error<E>> {
-        match enabled {
-            true => self.reg_update(Registers::XO_RCO_CONF0, device::XO_RCO_CONF0_REFDIV_REGMASK, device::XO_RCO_CONF0_REFDIV_REGMASK),
-            false => self.reg_update(Registers::XO_RCO_CONF0, device::XO_RCO_CONF0_REFDIV_REGMASK, 0),
-        }
+    pub fn info(&mut self) -> Result<Info, Error<SpiErr, PinErr, DelayErr>> {
+        Ok(Info{
+            part_no: self.read_register::<DeviceInfo1>().map(|r| r.part_no() )?,
+            version: self.read_register::<DeviceInfo0>().map(|r| r.version() )?,
+        })
     }
 
     /// Set radio operating channel
-    pub fn set_channel(&mut self, channel: u8) -> Result<(), Error<E>> {
-        self.reg_write(Registers::CHNUM, &[channel])
+    pub fn set_channel(&mut self, channel: u8) -> Result<(), Error<SpiErr, PinErr, DelayErr>> {
+        self.write_register::<ChNum>(ChNum::new().with_ch_num(channel))?;
+        Ok(())
     }
     
     /// Fetch radio operating channel
-    pub fn get_channel(&mut self) -> Result<u8, Error<E>> {
-        let mut tmp = [0u8; 1];
-        self.reg_read(Registers::CHNUM, &mut tmp).map(|v| v[0])
+    pub fn get_channel(&mut self) -> Result<u8, Error<SpiErr, PinErr, DelayErr>> {
+        self.read_register::<ChNum>().map(|r| r.ch_num() )
     }
-
 }
 
-#[cfg(test)]
-mod tests {
-    extern crate embedded_hal_mock;
-    use tests::embedded_hal_mock::MockError;
-    use tests::embedded_hal_mock::spi::{Mock as SpiMock, Transaction as SpiTransaction};
-    use tests::embedded_hal_mock::pin::{Mock as PinMock, Transaction as PinTransaction, State as PinState};
-    use tests::embedded_hal_mock::delay::MockNoop;
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub struct Info {
+    pub part_no: u8,
+    pub version: u8,
+}
 
-    extern crate embedded_hal;
-    use tests::embedded_hal::blocking::spi;
-    use tests::embedded_hal::blocking::spi::{Transfer, Write};
+impl<Hal, SpiErr, PinErr, DelayErr> radio::Registers<u8> for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Error = Error<SpiErr, PinErr, DelayErr>;
 
-    use super::*;
+    /// Read a register value
+    fn read_register<R: radio::Register<Word = u8>>(&mut self) -> Result<R, Self::Error> {
+        let mut d = [0u8];
+        self.hal.spi_read(
+            &[SpiCommand::Read as u8, R::ADDRESS], 
+            &mut d)?;
 
-    extern crate std;
-    use tests::std::boxed::Box;
+        R::try_from(d[0]).map_err(|_e| Error::UnexpectedValue(R::ADDRESS, d[0]))
+    }
 
-    #[test]
-    fn it_works() {
-    
-        let mut spi = SpiMock::new(&[]);
-        let mut cs = PinMock::new(&[]);
-        let mut sdn = PinMock::new(&[PinTransaction::set(PinState::Low), PinTransaction::set(PinState::High)]);
-        let mut int = PinMock::new(&[]);
+    /// Write a register value
+    fn write_register<R: radio::Register<Word = u8>>(
+        &mut self,
+        value: R,
+    ) -> Result<(), Self::Error> {
+        self.hal.spi_write(
+            &[SpiCommand::Write as u8, R::ADDRESS as u8],
+            &[value.into()],
+        )
+    }
+}
 
-        let s: Box<spi::Write<u8, Error=MockError>> = Box::new(spi.clone());
 
-        let radio = S2lp::new(spi.clone(), cs.clone(), sdn.clone(), int.clone(), MockNoop{});
+impl<Hal, SpiErr, PinErr, DelayErr> radio::State for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Error = Error<SpiErr, PinErr, DelayErr>;
 
-       
-       sdn.done();
+    type State = device::State;
+
+    fn set_state(&mut self, _state: Self::State) -> Result<(), Self::Error> {
+        todo!()
+    }
+
+    fn get_state(&mut self) -> Result<Self::State, Self::Error> {
+        todo!()
+    }
+}
+
+impl<Hal, SpiErr, PinErr, DelayErr> radio::Channel for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Channel = radio::BasicChannel;
+    type Error = Error<SpiErr, PinErr, DelayErr>;
+
+    fn set_channel(&mut self, _channel: &Self::Channel) -> Result<(), Self::Error> {
+        todo!()
+    }
+}
+
+impl<Hal, SpiErr, PinErr, DelayErr> radio::Power for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Error = Error<SpiErr, PinErr, DelayErr>;
+
+    fn set_power(&mut self, power: i8) -> Result<(), Self::Error> {
+        todo!()
+    }
+}
+
+impl<Hal, SpiErr, PinErr, DelayErr> radio::Rssi for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Error = Error<SpiErr, PinErr, DelayErr>;
+
+    fn poll_rssi(&mut self) -> Result<i16, Self::Error> {
+        todo!()
+    }
+}
+
+impl<Hal, SpiErr, PinErr, DelayErr> radio::Transmit for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Error = Error<SpiErr, PinErr, DelayErr>;
+
+    fn start_transmit(&mut self, _data: &[u8]) -> Result<(), Self::Error> {
+        todo!()
+    }
+
+    fn check_transmit(&mut self) -> Result<bool, Self::Error> {
+        todo!()
+    }
+}
+
+
+impl<Hal, SpiErr, PinErr, DelayErr> radio::Receive for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Error = Error<SpiErr, PinErr, DelayErr>;
+
+    type Info = radio::BasicInfo;
+
+    fn start_receive(&mut self) -> Result<(), Self::Error> {
+        todo!()
+    }
+
+    fn check_receive(&mut self, _restart: bool) -> Result<bool, Self::Error> {
+        todo!()
+    }
+
+    fn get_received(&mut self, _buff: &mut [u8]) -> Result<(usize, Self::Info), Self::Error> {
+        todo!()
+    }
+}
+
+impl<Hal, SpiErr, PinErr, DelayErr> DelayUs<u32> for S2lp<Hal, SpiErr, PinErr, DelayErr>
+where
+    Hal: Base<SpiErr, PinErr, DelayErr>,
+    SpiErr: Debug,
+    PinErr: Debug,
+    DelayErr: Debug,
+{
+    type Error = Error<SpiErr, PinErr, DelayErr>;
+
+    fn delay_us(&mut self, us: u32) -> Result<(), Self::Error> {
+        self.hal.delay_us(us)
     }
 }
