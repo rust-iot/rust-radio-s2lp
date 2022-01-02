@@ -44,7 +44,7 @@ where
     Rst: OutputPin<Error = PinErr>,
     //SlpTr: OutputPin<Error = PinErr>,
     //Irq: InputPin<Error = PinErr>,
-    Delay: DelayMs<u32, Error = DelayErr> + DelayUs<u32, Error = DelayErr>,
+    Delay: DelayUs<Error = DelayErr>,
     SpiErr: Debug,
     PinErr: Debug,
     DelayErr: Debug,
@@ -72,7 +72,7 @@ where
         cmd: &[u8],
         data: &mut [u8],
     ) -> Result<(), Error<SpiErr, PinErr, DelayErr>> {
-        let mut t = [Operation::Write(&cmd), Operation::Transfer(data)];
+        let mut t = [Operation::Write(&cmd), Operation::TransferInplace(data)];
 
         self.cs.set_low().map_err(Error::Pin)?;
 

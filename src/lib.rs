@@ -294,7 +294,7 @@ where
     }
 }
 
-impl<Hal, SpiErr, PinErr, DelayErr> DelayUs<u32> for S2lp<Hal, SpiErr, PinErr, DelayErr>
+impl<Hal, SpiErr, PinErr, DelayErr> DelayUs for S2lp<Hal, SpiErr, PinErr, DelayErr>
 where
     Hal: Base<SpiErr, PinErr, DelayErr>,
     SpiErr: Debug,
