@@ -8,7 +8,12 @@ use core::marker::PhantomData;
 
 use embedded_hal::{delay::blocking::DelayUs, spi::{Mode, Phase, Polarity}};
 use radio::{BasicChannel, Channel as _, Registers as _};
+
+#[cfg(not(feature="defmt"))]
 use log::debug;
+
+#[cfg(feature="defmt")]
+use defmt::debug;
 
 pub mod base;
 pub use base::{Base, Io};
@@ -151,6 +156,7 @@ where
 }
 
 #[derive(Copy, Clone, PartialEq, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Info {
     pub part_no: u8,
     pub version: u8,

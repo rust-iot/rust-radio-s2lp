@@ -1,7 +1,11 @@
 use core::fmt::Debug;
 
 use embedded_hal::{delay::blocking::*, digital::blocking::*, spi::blocking::*};
+
+#[cfg(not(feature="defmt"))]
 use log::{trace};
+#[cfg(feature="defmt")]
+use defmt::trace;
 
 use crate::{Error};
 
