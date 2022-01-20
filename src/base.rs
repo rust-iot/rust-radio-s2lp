@@ -90,7 +90,7 @@ where
     }
 
     fn reset(&mut self) -> Result<(), Error<SpiErr, PinErr, DelayErr>> {
-        // Deassert CS pin (active high)
+        // Deassert CS pin (active low)
         self.cs.set_high().map_err(Error::Pin)?;
 
         // Assert reset pin (active low)
