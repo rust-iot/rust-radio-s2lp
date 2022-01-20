@@ -409,7 +409,7 @@ pub struct Afc2 {
 }
 
 impl radio::Register for Afc2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AFC2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -423,7 +423,7 @@ pub struct Afc1 {
 }
 
 impl radio::Register for Afc1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AFC1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -437,7 +437,7 @@ pub struct Afc0 {
 }
 
 impl radio::Register for Afc0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AFC0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -451,7 +451,7 @@ pub struct RssiFlt {
 }
 
 impl radio::Register for RssiFlt {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RSSI_FLT as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -465,7 +465,7 @@ pub struct RssiTh {
 }
 
 impl radio::Register for RssiTh {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RSSI_TH as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -479,7 +479,7 @@ pub struct Agcctrl4 {
 }
 
 impl radio::Register for Agcctrl4 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AGCCTRL4 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -493,7 +493,7 @@ pub struct Agcctrl3 {
 }
 
 impl radio::Register for Agcctrl3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AGCCTRL3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -507,7 +507,7 @@ pub struct Agcctrl2 {
 }
 
 impl radio::Register for Agcctrl2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AGCCTRL2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -521,7 +521,7 @@ pub struct Agcctrl1 {
 }
 
 impl radio::Register for Agcctrl1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AGCCTRL1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -535,7 +535,7 @@ pub struct Agcctrl0 {
 }
 
 impl radio::Register for Agcctrl0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AGCCTRL0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -549,7 +549,7 @@ pub struct AntSelectConf {
 }
 
 impl radio::Register for AntSelectConf {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::ANT_SELECT_CONF as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -563,7 +563,7 @@ pub struct Clockrec2 {
 }
 
 impl radio::Register for Clockrec2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CLOCKREC2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -577,7 +577,7 @@ pub struct Clockrec1 {
 }
 
 impl radio::Register for Clockrec1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CLOCKREC1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -591,7 +591,7 @@ pub struct Pcktctrl6 {
 }
 
 impl radio::Register for Pcktctrl6 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKTCTRL6 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -605,7 +605,7 @@ pub struct Pcktctrl5 {
 }
 
 impl radio::Register for Pcktctrl5 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKTCTRL5 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -619,7 +619,7 @@ pub struct Pcktctrl4 {
 }
 
 impl radio::Register for Pcktctrl4 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKTCTRL4 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -633,7 +633,7 @@ pub struct Pcktctrl3 {
 }
 
 impl radio::Register for Pcktctrl3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKTCTRL3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -661,7 +661,7 @@ pub struct Pcktctrl1 {
 }
 
 impl radio::Register for Pcktctrl1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKTCTRL1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -675,7 +675,7 @@ pub struct Pcktlen1 {
 }
 
 impl radio::Register for Pcktlen1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKTLEN1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -689,7 +689,7 @@ pub struct Pcktlen0 {
 }
 
 impl radio::Register for Pcktlen0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKTLEN0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -703,7 +703,7 @@ pub struct Sync3 {
 }
 
 impl radio::Register for Sync3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::SYNC3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -717,7 +717,7 @@ pub struct Sync2 {
 }
 
 impl radio::Register for Sync2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::SYNC2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -731,7 +731,7 @@ pub struct Sync1 {
 }
 
 impl radio::Register for Sync1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::SYNC1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -745,7 +745,7 @@ pub struct Sync0 {
 }
 
 impl radio::Register for Sync0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::SYNC0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -759,7 +759,7 @@ pub struct Qi {
 }
 
 impl radio::Register for Qi {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::QI as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -773,7 +773,7 @@ pub struct PcktPstmbl {
 }
 
 impl radio::Register for PcktPstmbl {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKT_PSTMBL as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -815,7 +815,7 @@ pub struct Protocol0 {
 }
 
 impl radio::Register for Protocol0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PROTOCOL0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -829,7 +829,7 @@ pub struct FifoConfig3 {
 }
 
 impl radio::Register for FifoConfig3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::FIFO_CONFIG3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -843,7 +843,7 @@ pub struct FifoConfig2 {
 }
 
 impl radio::Register for FifoConfig2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::FIFO_CONFIG2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -857,7 +857,7 @@ pub struct FifoConfig1 {
 }
 
 impl radio::Register for FifoConfig1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::FIFO_CONFIG1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -871,7 +871,7 @@ pub struct FifoConfig0 {
 }
 
 impl radio::Register for FifoConfig0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::FIFO_CONFIG0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -899,7 +899,7 @@ pub struct PcktFltGoals4 {
 }
 
 impl radio::Register for PcktFltGoals4 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKT_FLT_GOALS4 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -913,7 +913,7 @@ pub struct PcktFltGoals3 {
 }
 
 impl radio::Register for PcktFltGoals3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKT_FLT_GOALS3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -927,7 +927,7 @@ pub struct PcktFltGoals2 {
 }
 
 impl radio::Register for PcktFltGoals2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKT_FLT_GOALS2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -941,7 +941,7 @@ pub struct PcktFltGoals1 {
 }
 
 impl radio::Register for PcktFltGoals1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKT_FLT_GOALS1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -955,7 +955,7 @@ pub struct PcktFltGoals0 {
 }
 
 impl radio::Register for PcktFltGoals0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PCKT_FLT_GOALS0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -969,7 +969,7 @@ pub struct Timers5 {
 }
 
 impl radio::Register for Timers5 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TIMERS5 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -983,7 +983,7 @@ pub struct Timers4 {
 }
 
 impl radio::Register for Timers4 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TIMERS4 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -997,7 +997,7 @@ pub struct Timers3 {
 }
 
 impl radio::Register for Timers3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TIMERS3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1011,7 +1011,7 @@ pub struct Timers2 {
 }
 
 impl radio::Register for Timers2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TIMERS2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1025,7 +1025,7 @@ pub struct Timers1 {
 }
 
 impl radio::Register for Timers1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TIMERS1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1039,7 +1039,7 @@ pub struct Timers0 {
 }
 
 impl radio::Register for Timers0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TIMERS0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1053,7 +1053,7 @@ pub struct CsmaConf3 {
 }
 
 impl radio::Register for CsmaConf3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CSMA_CONF3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1067,7 +1067,7 @@ pub struct CsmaConf2 {
 }
 
 impl radio::Register for CsmaConf2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CSMA_CONF2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1081,7 +1081,7 @@ pub struct CsmaConf1 {
 }
 
 impl radio::Register for CsmaConf1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CSMA_CONF1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1095,7 +1095,7 @@ pub struct CsmaConf0 {
 }
 
 impl radio::Register for CsmaConf0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CSMA_CONF0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1109,7 +1109,7 @@ pub struct IrqMask3 {
 }
 
 impl radio::Register for IrqMask3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_MASK3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1123,7 +1123,7 @@ pub struct IrqMask2 {
 }
 
 impl radio::Register for IrqMask2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_MASK2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1137,7 +1137,7 @@ pub struct IrqMask1 {
 }
 
 impl radio::Register for IrqMask1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_MASK1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1151,7 +1151,7 @@ pub struct IrqMask0 {
 }
 
 impl radio::Register for IrqMask0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_MASK0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1165,7 +1165,7 @@ pub struct FastRxTimer {
 }
 
 impl radio::Register for FastRxTimer {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::FAST_RX_TIMER as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1179,7 +1179,7 @@ pub struct PaPower8 {
 }
 
 impl radio::Register for PaPower8 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER8 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1193,7 +1193,7 @@ pub struct PaPower7 {
 }
 
 impl radio::Register for PaPower7 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER7 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1207,7 +1207,7 @@ pub struct PaPower6 {
 }
 
 impl radio::Register for PaPower6 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER6 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1221,7 +1221,7 @@ pub struct PaPower5 {
 }
 
 impl radio::Register for PaPower5 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER5 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1235,7 +1235,7 @@ pub struct PaPower4 {
 }
 
 impl radio::Register for PaPower4 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER4 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1249,7 +1249,7 @@ pub struct PaPower3 {
 }
 
 impl radio::Register for PaPower3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1263,7 +1263,7 @@ pub struct PaPower2 {
 }
 
 impl radio::Register for PaPower2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1277,7 +1277,7 @@ pub struct PaPower1 {
 }
 
 impl radio::Register for PaPower1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1291,7 +1291,7 @@ pub struct PaPower0 {
 }
 
 impl radio::Register for PaPower0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_POWER0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1305,7 +1305,7 @@ pub struct PaConfig1 {
 }
 
 impl radio::Register for PaConfig1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_CONFIG1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1319,7 +1319,7 @@ pub struct PaConfig0 {
 }
 
 impl radio::Register for PaConfig0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PA_CONFIG0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1333,7 +1333,7 @@ pub struct SynthConfig2 {
 }
 
 impl radio::Register for SynthConfig2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::SYNTH_CONFIG2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1347,7 +1347,7 @@ pub struct VcoConfig {
 }
 
 impl radio::Register for VcoConfig {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::VCO_CONFIG as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1361,7 +1361,7 @@ pub struct VcoCalibrIn2 {
 }
 
 impl radio::Register for VcoCalibrIn2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::VCO_CALIBR_IN2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1375,7 +1375,7 @@ pub struct VcoCalibrIn1 {
 }
 
 impl radio::Register for VcoCalibrIn1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::VCO_CALIBR_IN1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1389,7 +1389,7 @@ pub struct VcoCalibrIn0 {
 }
 
 impl radio::Register for VcoCalibrIn0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::VCO_CALIBR_IN0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1457,7 +1457,7 @@ pub struct RcoCalibrConf3 {
 }
 
 impl radio::Register for RcoCalibrConf3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RCO_CALIBR_CONF3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1471,7 +1471,7 @@ pub struct RcoCalibrConf2 {
 }
 
 impl radio::Register for RcoCalibrConf2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RCO_CALIBR_CONF2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1485,7 +1485,7 @@ pub struct PmConf4 {
 }
 
 impl radio::Register for PmConf4 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PM_CONF4 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1499,7 +1499,7 @@ pub struct PmConf3 {
 }
 
 impl radio::Register for PmConf3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PM_CONF3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1513,7 +1513,7 @@ pub struct PmConf2 {
 }
 
 impl radio::Register for PmConf2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PM_CONF2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1527,7 +1527,7 @@ pub struct PmConf1 {
 }
 
 impl radio::Register for PmConf1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PM_CONF1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1541,7 +1541,7 @@ pub struct PmConf0 {
 }
 
 impl radio::Register for PmConf0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::PM_CONF0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1555,7 +1555,7 @@ pub struct McState1 {
 }
 
 impl radio::Register for McState1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::MC_STATE1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1569,7 +1569,7 @@ pub struct McState0 {
 }
 
 impl radio::Register for McState0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::MC_STATE0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1583,7 +1583,7 @@ pub struct TxFifoStatus {
 }
 
 impl radio::Register for TxFifoStatus {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TX_FIFO_STATUS as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1597,7 +1597,7 @@ pub struct RxFifoStatus {
 }
 
 impl radio::Register for RxFifoStatus {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RX_FIFO_STATUS as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1611,7 +1611,7 @@ pub struct RcoCalibrOut4 {
 }
 
 impl radio::Register for RcoCalibrOut4 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RCO_CALIBR_OUT4 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1625,7 +1625,7 @@ pub struct RcoCalibrOut3 {
 }
 
 impl radio::Register for RcoCalibrOut3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RCO_CALIBR_OUT3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1639,7 +1639,7 @@ pub struct VcoCalibrOut1 {
 }
 
 impl radio::Register for VcoCalibrOut1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::VCO_CALIBR_OUT1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1653,7 +1653,7 @@ pub struct VcoCalibrOut0 {
 }
 
 impl radio::Register for VcoCalibrOut0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::VCO_CALIBR_OUT0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1667,7 +1667,7 @@ pub struct TxPcktInfo {
 }
 
 impl radio::Register for TxPcktInfo {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::TX_PCKT_INFO as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1681,7 +1681,7 @@ pub struct RxPcktInfo {
 }
 
 impl radio::Register for RxPcktInfo {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RX_PCKT_INFO as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1695,7 +1695,7 @@ pub struct AfcCorr {
 }
 
 impl radio::Register for AfcCorr {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::AFC_CORR as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1709,7 +1709,7 @@ pub struct LinkQualif2 {
 }
 
 impl radio::Register for LinkQualif2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::LINK_QUALIF2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1723,7 +1723,7 @@ pub struct LinkQualif1 {
 }
 
 impl radio::Register for LinkQualif1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::LINK_QUALIF1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1737,7 +1737,7 @@ pub struct RssiLevel {
 }
 
 impl radio::Register for RssiLevel {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RSSI_LEVEL as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1751,7 +1751,7 @@ pub struct RxPcktLen1 {
 }
 
 impl radio::Register for RxPcktLen1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RX_PCKT_LEN1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1765,7 +1765,7 @@ pub struct RxPcktLen0 {
 }
 
 impl radio::Register for RxPcktLen0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RX_PCKT_LEN0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1779,7 +1779,7 @@ pub struct CrcField3 {
 }
 
 impl radio::Register for CrcField3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CRC_FIELD3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1793,7 +1793,7 @@ pub struct CrcField2 {
 }
 
 impl radio::Register for CrcField2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CRC_FIELD2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1807,7 +1807,7 @@ pub struct CrcField1 {
 }
 
 impl radio::Register for CrcField1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CRC_FIELD1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1821,7 +1821,7 @@ pub struct CrcField0 {
 }
 
 impl radio::Register for CrcField0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::CRC_FIELD0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1835,7 +1835,7 @@ pub struct RxAddreField1 {
 }
 
 impl radio::Register for RxAddreField1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RX_ADDRE_FIELD1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1849,7 +1849,7 @@ pub struct RxAddreField0 {
 }
 
 impl radio::Register for RxAddreField0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RX_ADDRE_FIELD0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1863,7 +1863,7 @@ pub struct RssiLevelRun {
 }
 
 impl radio::Register for RssiLevelRun {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::RSSI_LEVEL_RUN as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1905,7 +1905,7 @@ pub struct IrqStatus3 {
 }
 
 impl radio::Register for IrqStatus3 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_STATUS3 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1919,7 +1919,7 @@ pub struct IrqStatus2 {
 }
 
 impl radio::Register for IrqStatus2 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_STATUS2 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1933,7 +1933,7 @@ pub struct IrqStatus1 {
 }
 
 impl radio::Register for IrqStatus1 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_STATUS1 as u8;
     type Word = u8;
     type Error = Infallible;
 }
@@ -1947,7 +1947,7 @@ pub struct IrqStatus0 {
 }
 
 impl radio::Register for IrqStatus0 {
-    const ADDRESS: u8 = 0u8;
+    const ADDRESS: u8 = Registers::IRQ_STATUS0 as u8;
     type Word = u8;
     type Error = Infallible;
 }
