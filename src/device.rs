@@ -339,6 +339,8 @@ pub enum ModType {
     Mod4Gfsk = 3,
     /// ASK/OOK
     ModAskOok = 5,
+    /// Unmodulated carrier, test mode
+    ModUnmodulated = 7,
     /// 2-GFSK BT=0.5
     Mod2GfskBt05 = 10,
     /// 4-GFSK BT=0.5
