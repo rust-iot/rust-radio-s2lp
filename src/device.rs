@@ -25,10 +25,10 @@ pub const XO_RCO_CONF1_PD_CLKDIV_REGMASK: u8 = 0x10;
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct Gpio0Conf {
-    pub gpio_select: GpioOutSelect,
+    pub gpio_mode: GpioMode,
     #[skip]
     __: B1,
-    pub gpio_mode: GpioMode,
+    pub gpio_select: GpioOutSelect,
 }
 
 impl radio::Register for Gpio0Conf {
@@ -42,10 +42,10 @@ impl radio::Register for Gpio0Conf {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct Gpio1Conf {
-    pub gpio_select: GpioOutSelect,
+    pub gpio_mode: GpioMode,
     #[skip]
     __: B1,
-    pub gpio_mode: GpioMode,
+    pub gpio_select: GpioOutSelect,
 }
 
 impl radio::Register for Gpio1Conf {
@@ -59,10 +59,10 @@ impl radio::Register for Gpio1Conf {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct Gpio2Conf {
-    pub gpio_select: GpioOutSelect,
+    pub gpio_mode: GpioMode,
     #[skip]
     __: B1,
-    pub gpio_mode: GpioMode,
+    pub gpio_select: GpioOutSelect,
 }
 
 impl radio::Register for Gpio2Conf {
@@ -76,10 +76,10 @@ impl radio::Register for Gpio2Conf {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct Gpio3Conf {
-    pub gpio_select: GpioOutSelect,
+    pub gpio_mode: GpioMode,
     #[skip]
     __: B1,
-    pub gpio_mode: GpioMode,
+    pub gpio_select: GpioOutSelect,
 }
 
 impl radio::Register for Gpio3Conf {
@@ -155,12 +155,12 @@ pub enum GpioInSelect {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct Synt3 {
-    /// Set the charge pump current according to the XTAL frequency
-    pub pll_cp_isel: B3,
-    /// Synthesizer band select. This parameter selects the out-of loop divide factor of the synthesizer
-    pub band_sel: B1,
     /// MSB bits of the PLL programmable divider
     pub synt_27_24: B4,
+    /// Synthesizer band select. This parameter selects the out-of loop divide factor of the synthesizer
+    pub band_sel: bool,
+    /// Set the charge pump current according to the XTAL frequency
+    pub pll_cp_isel: B3,
 }
 
 impl radio::Register for Synt3 {
@@ -311,10 +311,10 @@ impl radio::Register for Mod3 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct Mod2 {
+    /// Datarate exponent
+    pub datarate_e: B4,
     /// Modulation type
     pub mod_type: ModType,
-    /// Datarate exponent
-    pub datarate_e: B4
 }
 
 impl radio::Register for Mod2 {
@@ -352,14 +352,14 @@ pub enum ModType {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct Mod1 {
-    /// enable the PA power interpolator
-    pub pa_interp_en: bool,
-    /// enable frequency interpolator for the GFSK shaping
-    pub mod_interp_en: bool,
-    /// Select the constellation map for 4-(G)FSK or 2-(G)FSK modulations
-    pub const_map: B2,
     /// The exponent value of the frequency deviation equation
     pub fdev_e: B4,
+    /// Select the constellation map for 4-(G)FSK or 2-(G)FSK modulations
+    pub const_map: B2,
+    /// enable frequency interpolator for the GFSK shaping
+    pub mod_interp_en: bool,
+    /// enable the PA power interpolator
+    pub pa_interp_en: bool,
 }
 
 impl radio::Register for Mod1 {
@@ -388,10 +388,10 @@ impl radio::Register for Mod0 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct ChFlt {
-    /// The mantissa value of the receiver channel filter
-    pub chflt_m: B4,
     /// The exponent value of the receiver channel filter
     pub chflt_e: B4,
+    /// The mantissa value of the receiver channel filter
+    pub chflt_m: B4,
 }
 
 impl radio::Register for ChFlt {
@@ -1400,11 +1400,11 @@ impl radio::Register for VcoCalibrIn0 {
 #[repr(u8)]
 pub struct XoRcoConf1 {
     #[skip]
-    __: B3,
+    __: B4,
     /// disable both dividers of digital clock
     pub pd_clkdiv: bool,
     #[skip]
-    __: B4,
+    __: B3,
 }
 
 impl radio::Register for XoRcoConf1 {
@@ -1418,18 +1418,18 @@ impl radio::Register for XoRcoConf1 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct XoRcoConf0 {
-    /// Set external reference mode
-    pub ext_ref: ExtRefMode,
-    /// Set the driver gm of the XO at start up
-    pub gm_conf: B3,
-    /// Enable the the reference clock divider
-    pub ref_div: bool,
-    #[skip]
-    __: B1,
-    /// Enable external RCO, the 34.7 kHz signal must be supplied from any GPIO
-    pub ext_rco_osc: bool,
     /// Enable the automatic RCO calibratio
     pub rco_calibration: bool,
+    /// Enable external RCO, the 34.7 kHz signal must be supplied from any GPIO
+    pub ext_rco_osc: bool,
+    #[skip]
+    __: B1,
+    /// Enable the the reference clock divider
+    pub ref_div: bool,
+    /// Set the driver gm of the XO at start up
+    pub gm_conf: B3,
+    /// Set external reference mode
+    pub ext_ref: ExtRefMode,
 }
 
 /// External clock reference mode
@@ -1551,7 +1551,18 @@ impl radio::Register for PmConf0 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct McState1 {
-    pub raw: u8,
+    /// RCO calibration error
+    pub error_lock: bool,
+    /// RX FIFO is empty
+    pub rx_fifo_empty: bool,
+    /// TX FIFO is full
+    pub tx_fifo_full: bool,
+    /// Currently selected antenna
+    pub ant_sel: bool,
+    /// RCO calibration successfully terminated
+    pub rca_cal_ok: bool,
+    #[skip]
+    __: B3,
 }
 
 impl radio::Register for McState1 {
@@ -1565,7 +1576,8 @@ impl radio::Register for McState1 {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub struct McState0 {
-    pub raw: u8,
+    pub xo_on: bool,
+    pub state: State,
 }
 
 impl radio::Register for McState0 {
