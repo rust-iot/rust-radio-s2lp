@@ -1,0 +1,24 @@
+[package]
+name = "util"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.44"
+structopt = "0.3.25"
+tracing = "0.1.25"
+tracing-subscriber = "0.2.16"
+log = "0.4.14"
+
+[dependencies.driver-pal]
+version = "0.8.0-alpha.5"
+features = ["hal", "hal-cp2130", "hal-linux"]
+
+[dependencies.radio]
+version = "0.10.0"
+features = ["helpers"]
+
+[dependencies.radio-s2lp]
+path = ".."
