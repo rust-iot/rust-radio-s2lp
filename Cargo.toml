@@ -5,39 +5,22 @@ version = "0.1.0"
 authors = ["Ryan Kurte <ryankurte@gmail.com>"]
 edition = "2021"
 
-[features]
-std = [ "thiserror", "anyhow" ]
-util = ["structopt", "tracing", "tracing-subscriber", "humantime", "driver-pal/hal", "radio/helpers" ]
-default = [ "std", "util", "driver-pal/hal-cp2130", "driver-pal/hal-linux" ]
-
+[workspace]
+members = ["util"]
 
 [dependencies]
-embedded-hal = "1.0.0-alpha.5"
+embedded-hal = "=1.0.0-alpha.5"
 radio = "0.10.0"
 modular-bitfield = "0.11.2"
 log = "0.4.14"
-num_enum = { version = "0.5.4", default_features = false }
-
-# Util dependencies
-driver-pal = { version = "0.8.0-alpha.5", default_features = false }
-structopt = { version = "0.3.25", optional = true }
+num_enum = "0.5.4"
+# Optional features
 thiserror = { version = "1.0.30", optional = true }
-humantime = { version = "2.1.0", optional = true }
-tracing = { version = "0.1.25", optional = true }
-tracing-subscriber = { version = "0.2.16", optional = true }
 serde = { version = "1.0.130", optional = true }
 defmt = { version = "0.2.3", optional = true }
-anyhow = { version = "1.0.44", optional = true }
 
 [dev-dependencies]
 embedded-hal-mock = { version = "0.8.0" }
 simplelog = "0.5.3"
-
-
-[[bin]]
-name = "s2lp-util"
-path = "src/util/main.rs"
-required-features = [ "util" ]
-
 
 [patch.crates-io]
